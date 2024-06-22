@@ -90,12 +90,12 @@ const Carousel: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className="mt-4 flex justify-center space-x-2">
+      <div className="mt-4 flex justify-center space-x-2 absolute top-4 left-12">
         {banners.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`h-2 w-2 rounded-full ${currentIndex === index ? 'bg-blue-600' : 'bg-gray-400'}`}
+            className={`h-2 w-2 rounded-full ${currentIndex === index ? 'bg-white' : 'bg-white/80'}`}
           ></button>
         ))}
       </div>

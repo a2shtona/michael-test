@@ -1,3 +1,4 @@
+"use client";
 import { FiSearch } from "react-icons/fi";
 import { BsStars } from "react-icons/bs";
 import Carousel from "../Elements/Carousel";
