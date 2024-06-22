@@ -74,7 +74,7 @@ const Sidebar = () => {
             </div>
             <RiSortDesc className="w-6 h-6 relative text-zinc-400" />
           </div>
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-1">
             {users.map((user, index) => (
               <UserCard
                 key={index}
@@ -86,7 +86,7 @@ const Sidebar = () => {
           </div>
         </div>
       <div>
-        <div className="bg-button rounded-lg flex flex-row justify-between overflow-hidden items-center h-14 mb-1">
+        <div className="bg-button rounded-lg hidden sm:flex flex-row justify-between overflow-hidden items-center h-14 mb-1">
           <span className="text-white text-sm font-medium font-inter p-4">
             Join our discord
           </span>
