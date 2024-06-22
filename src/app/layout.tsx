@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import Sidebar from "@/components/Layouts/Sidebar";
 import "./globals.css";
-import '@/assets/Inter/stylesheet.css'
+import "@/assets/Inter/stylesheet.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,7 +15,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden bg-hero-image3 bg-no-repeat bg-cover">
+          <div className="w-16 flex-none sm:w-72">
+            <Sidebar />
+          </div>
+          <div className="flex-grow p-6 sm:overflow-y-auto sm:p-12">
+            {children}
+          </div>
+        </div>
+      </body>
     </html>
   );
 }

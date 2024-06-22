@@ -15,6 +15,10 @@ const config: Config = {
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
+      },
+      colors: {
+        "card": "#121212",
+        "button": "#202020"
       }
     },
   },
