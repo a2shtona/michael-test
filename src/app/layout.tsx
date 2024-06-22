@@ -16,12 +16,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden bg-hero-image3 bg-no-repeat bg-cover">
+        <div className="flex h-screen flex-row sm:overflow-hidden bg-hero-image3 bg-no-repeat bg-cover">
           <div className="w-16 flex-none sm:w-72">
             <Sidebar />
           </div>
-          <div className="flex-grow p-6 sm:overflow-y-auto sm:p-12">
-            {children}
+          <div className="flex-grow overflow-y-auto">
+          {children}
           </div>
         </div>
       </body>

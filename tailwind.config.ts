@@ -15,6 +15,7 @@ const config: Config = {
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
+        'dm-sans': ['DMSans', 'sans-serif']
       },
       colors: {
         "card": "#121212",
