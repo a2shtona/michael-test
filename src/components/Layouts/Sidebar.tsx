@@ -2,7 +2,7 @@ import Image from "next/image";
 import { RiLayoutRightLine } from "react-icons/ri";
 import { RiHomeLine } from "react-icons/ri";
 import { FiSearch } from "react-icons/fi";
-import { BsStars } from "react-icons/bs";
+import StarsIcon from "../Elements/Stars";
 import { RiSortDesc } from "react-icons/ri";
 import UserCard from "../Elements/UserCard";
 type UserProps = {
@@ -47,19 +47,19 @@ const Sidebar = () => {
         </div>
         <div className="flex flex-row sm:justify-start w-full sm:px-3 py-2 justify-center gap-4 items-center mt-1">
           <RiHomeLine className="w-6 h-6 relative text-zinc-400" />
-          <span className="text-sm text-zinc-400 font-inter font-medium hidden sm:block">
+          <span className="text-base text-zinc-400 font-inter font-medium hidden sm:block">
             Home
           </span>
         </div>
         <div className="flex flex-row sm:justify-start w-full sm:px-3 py-2 justify-center gap-4 items-center">
           <FiSearch className="w-6 h-6 relative text-zinc-400" />
-          <span className="text-sm text-zinc-400 font-inter font-medium hidden sm:block">
+          <span className="text-base text-zinc-400 font-inter font-medium hidden sm:block">
             Search
           </span>
         </div>
         <div className="flex flex-row items-center justify-center gap-2 sm:px-4 sm:py-1.5 p-1.5 bg-button rounded-full">
-          <BsStars className="w-5 h-5 relative text-neutral-200" />
-          <span className="text-sm text-neutral-200 font-inter font-medium hidden sm:block">
+          <StarsIcon className="w-6 h-6 relative text-neutral-200" />
+          <span className="text-base text-neutral-200 font-inter font-medium hidden sm:block">
             Create
           </span>
         </div>
