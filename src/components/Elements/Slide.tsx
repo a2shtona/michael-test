@@ -162,7 +162,7 @@ const Carousel: React.FC<ICarouselProps> = (props) => {
         );
       })}
       {withNavigation && (
-        <div className="animated-carousel-dots" style={{ zIndex: 1 }}>
+        <div className="animated-carousel-dots flex flex-row gap-1" style={{ zIndex: 1 }}>
           {slides.map((_, index) => (
             <button
               key={index}
