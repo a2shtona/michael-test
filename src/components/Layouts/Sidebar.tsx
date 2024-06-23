@@ -57,7 +57,7 @@ const Sidebar = () => {
             Search
           </span>
         </div>
-        <div className="flex flex-row items-center justify-center gap-2 sm:px-4 sm:py-1.5 p-1.5 bg-button rounded-full">
+        <div className="flex flex-row items-center justify-center gap-2 sm:px-4 sm:py-1.5 p-1.5 bg-button rounded-full mt-2">
           <StarsIcon className="w-6 h-6 relative text-neutral-200" />
           <span className="text-base text-neutral-200 font-inter font-medium hidden sm:block">
             Create
