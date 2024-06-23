@@ -2,7 +2,7 @@ import Image from "next/image"
 const Banner3 = ()=> {
   return(
     <div className="w-full h-60 bg-[#B059CE] rounded-2xl grid sm:grid-cols-2 grid-cols-1 overflow-hidden">
-      <div className="flex flex-col h-full w-full px-8 pb-8 pt-12 justify-between">
+      <div className="flex flex-col h-full w-full px-8 pb-8 pt-16 justify-between">
         <div className="flex flex-col w-[450px]">
           <h1 className="text-white text-2xl font-semibold font-inter">
             Try this out!
