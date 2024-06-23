@@ -1,5 +1,4 @@
-"use client";
-import React, { useEffect, useState, useReducer, useRef } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 
 interface ICarouselProps {
   slides: React.ReactElement[];
@@ -14,93 +13,168 @@ interface ICarouselProps {
 
 interface ICarouselState {
   active: number;
-  nextActive: number;
 }
 
 interface IAction {
-  type: "NEXT" | "CUSTOM";
+  type: "NEXT" | "PREV" | "CUSTOM";
   index?: number;
 }
 
-export default function Carousel(props: ICarouselProps): React.ReactElement {
-  const [state, dispatch] = useReducer(
-    (state: ICarouselState, action: IAction) => {
-      switch (action.type) {
-        case "NEXT":
-          return {
-            active: state.nextActive,
-            nextActive: (state.nextActive + 1) % props.slides.length,
-          };
-        case "CUSTOM":
-          if (typeof action.index !== "undefined") {
-            return {
-              active: action.index,
-              nextActive: (action.index + 1) % props.slides.length,
-            };
-          }
-          return state;
-        default:
-          throw new Error();
-      }
-    },
-    { active: 0, nextActive: 1 }
-  );
+const initialState: ICarouselState = {
+  active: 0,
+};
 
+const reducer = (state: ICarouselState, action: IAction): ICarouselState => {
+  switch (action.type) {
+    case "NEXT":
+      return {
+        active: (state.active + 1) % action.index!,
+      };
+    case "PREV":
+      return {
+        active: (state.active - 1 + action.index!) % action.index!,
+      };
+    case "CUSTOM":
+      if (typeof action.index !== "undefined") {
+        return {
+          active: action.index,
+        };
+      }
+      return state;
+    default:
+      return state;
+  }
+}
+
+const Carousel: React.FC<ICarouselProps> = (props) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { active } = state;
+  const { slides, duration = 5000, withNavigation } = props;
+  const slidesLength = slides.length;
+
+  const containerRef = useRef<HTMLDivElement>(null);
   const timerId = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentTranslate, setCurrentTranslate] = useState(0);
+  const [prevTranslate, setPrevTranslate] = useState(0);
+
+  const startDragging = (event: MouseEvent | TouchEvent) => {
+    setIsDragging(true);
+    setStartX(event instanceof MouseEvent ? event.clientX : event.touches[0].clientX);
+    setPrevTranslate(currentTranslate);
+
     if (timerId.current) {
       clearTimeout(timerId.current);
     }
+  };
+
+  const onDragging = (event: MouseEvent | TouchEvent) => {
+    if (isDragging) {
+      const currentX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+      setCurrentTranslate(currentX - startX);
+    }
+  };
+
+  const endDragging = () => {
+    if (!isDragging) return;
+
+    setIsDragging(false);
+    const movedBy = currentTranslate;
+
+    if (movedBy < -100) {
+      dispatch({ type: "NEXT", index: slidesLength });
+    } else if (movedBy > 100) {
+      dispatch({ type: "PREV", index: slidesLength });
+    }
+
+    setCurrentTranslate(0);
+    setPrevTranslate(0);
+
     timerId.current = setTimeout(() => {
-      dispatch({ type: "NEXT" });
-    }, props.duration || 5000); // Default to 5 seconds
+      dispatch({ type: "NEXT", index: slidesLength });
+    }, duration);
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (container) {
+      container.addEventListener("mousedown", startDragging);
+      container.addEventListener("mousemove", onDragging);
+      container.addEventListener("mouseup", endDragging);
+      container.addEventListener("mouseleave", endDragging); // Handle mouse leaving
+      container.addEventListener("touchstart", startDragging);
+      container.addEventListener("touchmove", onDragging);
+      container.addEventListener("touchend", endDragging);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener("mousedown", startDragging);
+        container.removeEventListener("mousemove", onDragging);
+        container.removeEventListener("mouseup", endDragging);
+        container.removeEventListener("mouseleave", endDragging); // Handle mouse leaving
+        container.removeEventListener("touchstart", startDragging);
+        container.removeEventListener("touchmove", onDragging);
+        container.removeEventListener("touchend", endDragging);
+      }
+    };
+  }, [isDragging, currentTranslate]);
+
+  useEffect(() => {
+    timerId.current = setTimeout(() => {
+      dispatch({ type: "NEXT", index: slidesLength });
+    }, duration);
 
     return () => {
       if (timerId.current) {
         clearTimeout(timerId.current);
       }
     };
-  }, [state.nextActive, props.duration]);
+  }, [active, duration, slidesLength]);
 
   return (
-    <div style={styles.container} className="animated-carousel-container">
-      {(props.slides || []).map((slide, index) => (
-        <div
-          key={index}
-          style={{
-            ...styles.item,
-            ...getAnimationStyle({
-              index,
-              activeIndex: state.active,
-              nextActiveIndex: state.nextActive,
-              animationType: props.animationType,
-              duration: props.animationDuration,
-              timingFunction: props.animationTimingFunction,
-              animationDelay: props.animationDelay,
-            }),
-          }}
-          className="animated-carousel-item text-start"
-        >
-          {slide}
-        </div>
-      ))}
-      {props.withNavigation && (
-        <div className="animated-carousel-dots flex flex-row gap-1" style={{ zIndex: 1 }}>
-          {props.slides.map((_, index) => (
+    <div ref={containerRef} style={styles.container} className="animated-carousel-container">
+      {slides.map((slide, index) => {
+        const isCurrent = index === active;
+        const isPrevious = (index === (active - 1 + slidesLength) % slidesLength);
+        const isNext = (index === (active + 1) % slidesLength);
+
+        return (
+          <div
+            key={index}
+            className="animated-carousel-item"
+            style={{
+              ...styles.item,
+              ...getAnimationStyle({
+                isCurrent,
+                isPrevious,
+                isNext,
+                translate: currentTranslate,
+                isDragging
+              }),
+            }}
+          >
+            {slide}
+          </div>
+        );
+      })}
+      {withNavigation && (
+        <div className="animated-carousel-dots" style={{ zIndex: 1 }}>
+          {slides.map((_, index) => (
             <button
               key={index}
-              className={`animated-carousel-dot ${
-                index === state.active ? "active" : ""
-              }`.trim()}
+              className={`animated-carousel-dot ${index === active ? "active" : ""}`.trim()}
               onClick={() => dispatch({ type: "CUSTOM", index })}
               style={
                 {
-                  '--animation-duration': `${props.duration || 5000}ms`,
+                  '--animation-duration': `${duration}ms`,
                 } as React.CSSProperties
               }
             >
-              {index === state.active && (
+              {index === active && (
                 <svg>
                   <circle cx="10" cy="10" r="8" />
                 </svg>
@@ -119,68 +193,58 @@ const styles: { [key: string]: React.CSSProperties } = {
     overflow: "hidden",
     width: "100%",
     height: "100%",
+    touchAction: "pan-y",
+    cursor: 'grab'
   },
   item: {
     position: "absolute",
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  },
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    willChange: "transform",
+    transition: "transform 0.3s ease"
+  }
 };
 
 interface AnimationStyleProps {
-  index: number;
-  activeIndex: number;
-  nextActiveIndex: number;
-  animationType?: "FADE" | "SLIDE" | "ZOOM";
-  duration?: number;
-  timingFunction?: string;
-  animationDelay?: number;
+  isCurrent: boolean;
+  isPrevious: boolean;
+  isNext: boolean;
+  translate: number;
+  isDragging: boolean;
 }
 
-function getAnimationStyle({
-  index,
-  activeIndex,
-  animationType,
-  duration,
-  timingFunction,
-  animationDelay,
-}: AnimationStyleProps): React.CSSProperties {
-  const transitionPostfix: string = `${(duration || 700) / 1000}s ${
-    timingFunction || "cubic-bezier(0.1, 0.99, 0.1, 0.99)"
-  } ${(animationDelay || 100) / 1000}s`;
+const getAnimationStyle = ({ isCurrent, isPrevious, isNext, translate, isDragging }: AnimationStyleProps): React.CSSProperties => {
+  const draggingStyle = isDragging ? { transition: "none" } : {};
+  
+  if (isCurrent) {
+    return {
+      transform: `translateX(${translate}px)`,
+      zIndex: 1,
+      ...draggingStyle
+    };
+  }
 
-  let style: React.CSSProperties;
+  if (isPrevious) {
+    return {
+      transform: `translateX(calc(-100% + ${translate}px))`,
+      zIndex: isDragging ? 1 : 0,
+      ...draggingStyle
+    };
+  }
 
-  switch (animationType) {
-    case "FADE":
-      style = {
-        opacity: activeIndex === index ? 1 : 0,
-        transition: `opacity ${transitionPostfix}`,
-      };
-      break;
-    case "SLIDE":
-      style = {
-        transform: `translateX(${(index - activeIndex) * 100}%)`,
-        transition: `transform ${transitionPostfix}`,
-      };
-      break;
-    case "ZOOM":
-      style = {
-        transform: `scale(${activeIndex === index ? 1 : 2})`,
-        opacity: activeIndex === index ? 1 : 0,
-        transition: `transform ${transitionPostfix}, opacity ${transitionPostfix}`,
-      };
-      break;
-    default:
-      style = {
-        opacity: activeIndex === index ? 1 : 0,
-        transition: "none",
-      };
+  if (isNext) {
+    return {
+      transform: `translateX(calc(100% + ${translate}px))`,
+      zIndex: isDragging ? 1 : 0,
+      ...draggingStyle
+    };
   }
 
   return {
-    ...style,
-    zIndex: activeIndex === index ? 1 : 0,
+    transform: "translateX(100%)",
   };
 }
+
+export default Carousel;

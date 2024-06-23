@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Sidebar from "@/components/Layouts/Sidebar";
 import "./globals.css";
+import "./slide.css"
 import "@/assets/Inter/stylesheet.css";
 
 export const metadata: Metadata = {
